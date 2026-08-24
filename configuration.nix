@@ -4,6 +4,18 @@
 
 { config, pkgs, ... }:
 
+let
+  # Скрипт-переключатель, который сам проверяет статус интерфейса
+  vpnToggle = pkgs.writeShellScriptBin "toggle-vpn" ''
+    if ${pkgs.iproute2}/bin/ip link show pl-waw-wg-201 > /dev/null 2>&1; then
+        sudo ${pkgs.wireguard-tools}/bin/wg-quick down pl-waw-wg-201
+        ${pkgs.libnotify}/bin/notify-send -t 3000 "WireGuard" "🔴 Отключен (pl-waw-wg-201)"
+    else
+        sudo ${pkgs.wireguard-tools}/bin/wg-quick up pl-waw-wg-201
+        ${pkgs.libnotify}/bin/notify-send -t 3000 "WireGuard" "🟢 Подключен (pl-waw-wg-201)"
+    fi
+  '';
+in
 {
   imports =
     [ # Include the results of the hardware scan.
@@ -79,11 +91,22 @@
     #  thunderbird
     ];
   };
+
   # Отключаем залипший диод микрофона (очищаем триггер и гасим яркость)
   systemd.tmpfiles.rules = [
     "w /sys/class/leds/platform::micmute/trigger - - - - none"
     "w /sys/class/leds/platform::micmute/brightness - - - - 0"
   ];
+
+  # Разрешаем запуск wg-quick без пароля для скрипта переключателя
+  security.sudo.extraRules = [{
+    users = [ "waff" ];
+    commands = [{
+      command = "${pkgs.wireguard-tools}/bin/wg-quick";
+      options = [ "NOPASSWD" ];
+    }];
+  }];
+
   # Install firefox.
   programs.firefox.enable = true;
 
@@ -95,6 +118,8 @@
   environment.systemPackages = with pkgs; [
   #  vim # Do not forget to add an editor to edit configuration.nix! The Nano editor is also installed by default.
   #  wget
+    vpnToggle
+    libnotify
   ];
 
   # Some programs need SUID wrappers, can be configured further or are
@@ -115,6 +140,7 @@
   # networking.firewall.allowedUDPPorts = [ ... ];
   # Or disable the firewall altogether.
   # networking.firewall.enable = false;
+
   # Шаг 1: Включаем графические драйверы и аппаратное ускорение (Mesa для AMD)
   hardware.graphics = {
     enable = true;
@@ -125,11 +151,13 @@
   environment.sessionVariables = {
     MOZ_ENABLE_WAYLAND = "1";
   };
+
   # Отключаем агрессивное энергосбережение экрана AMD (Vari-Bright / ABM)
-  boot.kernelParams = [ 
-    "amdgpu.abmlevel=0" 
+  boot.kernelParams = [
+    "amdgpu.abmlevel=0"
   ];
-# This value determines the NixOS release from which the default
+
+  # This value determines the NixOS release from which the default
   # settings for stateful data, like file locations and database versions
   # on your system were taken. It‘s perfectly fine and recommended to leave
   # this value at the release version of the first install of this system.

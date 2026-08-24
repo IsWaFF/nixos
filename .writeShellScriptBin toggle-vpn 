@@ -1,0 +1,1337 @@
+[4mGIT[24m(1)                                                                   Git Manual                                                                  [4mGIT[24m(1)
+
+[1mNAME[0m
+     git - the stupid content tracker
+
+[1mSYNOPSIS[0m
+     [4mgit[24m [-v | --version] [-h | --help] [-C <path>] [-c <name>=<value>]
+         [--exec-path[=<path>]] [--html-path] [--man-path] [--info-path]
+         [-p | --paginate | -P | --no-pager] [--no-replace-objects] [--no-lazy-fetch]
+         [--no-optional-locks] [--no-advice] [--bare] [--git-dir=<path>]
+         [--work-tree=<path>] [--namespace=<name>] [--config-env=<name>=<envvar>]
+         <command> [<args>]
+
+[1mDESCRIPTION[0m
+     Git  is a fast, scalable, distributed revision control system with an unusually rich command set that provides both high-level operations and full ac‐
+     cess to internals.
+
+     See [1mgittutorial[22m(7) to get started, then see [1mgiteveryday[22m(7) for a useful minimum set of commands. The [34m[1mGit User’s Manual[0m[1m[22m[1] has a more  in-depth  intro‐
+     duction.
+
+     After  you mastered the basic concepts, you can come back to this page to learn what commands Git offers. You can learn more about individual Git com‐
+     mands with "git help command". [1mgitcli[22m(7) manual page gives you an overview of the command-line command syntax.
+
+     A formatted and hyperlinked copy of the latest Git documentation can be viewed at [34m[1mhttps://git.github.io/htmldocs/git.html [0m[1m[22mor [34m[1mhttps://git-scm.com/docs[0m[1m[22m.
+
+[1mOPTIONS[0m
+     -v, --version
+         Prints the Git suite version that the [4mgit[24m program came from.
+
+         This option is internally converted to [1mgit version [22m... and accepts the same options as the [1mgit-version[22m(1) command. If [1m--help  [22mis  also  given,  it
+         takes precedence over [1m--version[22m.
+
+     -h, --help
+         Prints  the synopsis and a list of the most commonly used commands. If the option [1m--all [22mor [1m-a [22mis given then all available commands are printed. If
+         a Git command is named this option will bring up the manual page for that command.
+
+         Other options are available to control how the manual page is displayed. See [1mgit-help[22m(1) for more information, because [1mgit --help [22m... is converted
+         internally into [1mgit help [22m....
+
+     -C <path>
+         Run as if git was started in [4m<path>[24m instead of the current working directory. When multiple [1m-C [22moptions are given, each subsequent non-absolute  [1m-C[0m
+         [4m<path>[24m is interpreted relative to the preceding [1m-C [4m[22m<path>[24m. If [4m<path>[24m is present but empty, e.g.  [1m-C [22m"", then the current working directory is left
+         unchanged.
+
+         This  option  affects  options  that expect path name like [1m--git-dir [22mand [1m--work-tree [22min that their interpretations of the path names would be made
+         relative to the working directory caused by the [1m-C [22moption. For example the following invocations are equivalent:
+
+             git --git-dir=a.git --work-tree=b -C c status
+             git --git-dir=c/a.git --work-tree=c/b status
+
+     -c <name>=<value>
+         Pass a configuration parameter to the command. The value given will override values from configuration files. The <name> is expected in  the  same
+         format as listed by [4mgit[24m [4mconfig[24m (subkeys separated by dots).
+
+         Note  that omitting the [1m= [22min [1mgit -c foo.bar [22m... is allowed and sets [1mfoo.bar [22mto the boolean true value (just like [[1mfoo[22m][1mbar [22mwould in a config file).
+         Including the equals but with an empty value (like [1mgit -c foo.bar= [22m...) sets [1mfoo.bar [22mto the empty string which [1mgit config --type=bool [22mwill convert
+         to [1mfalse[22m.
+
+     --config-env=<name>=<envvar>
+         Like [1m-c [4m[22m<name>[24m[1m=[4m[22m<value>[24m, give configuration variable [4m<name>[24m a value, where <envvar> is the name of an environment variable from which  to  retrieve
+         the  value.  Unlike [1m-c [22mthere is no shortcut for directly setting the value to an empty string, instead the environment variable itself must be set
+         to the empty string. It is an error if the [4m<envvar>[24m does not exist in the environment.  [4m<envvar>[24m may not contain an equals sign to avoid ambiguity
+         with [4m<name>[24m containing one.
+
+         This is useful for cases where you want to pass transitory configuration options to git, but  are  doing  so  on  operating  systems  where  other
+         processes  might  be able to read your command line (e.g.  [1m/proc/self/cmdline[22m), but not your environment (e.g.  [1m/proc/self/environ[22m). That behavior
+         is the default on Linux, but may not be on your system.
+
+         Note that this might add security for variables such as [1mhttp.extraHeader [22mwhere the sensitive information is  part  of  the  value,  but  not  e.g.
+         [1murl.[4m[22m<base>[24m[1m.insteadOf [22mwhere the sensitive information can be part of the key.
+
+     --exec-path[=<path>]
+         Path  to  wherever your core Git programs are installed. This can also be controlled by setting the GIT_EXEC_PATH environment variable. If no path
+         is given, [4mgit[24m will print the current setting and then exit.
+
+     --html-path
+         Print the path, without trailing slash, where Git’s HTML documentation is installed and exit.
+
+     --man-path
+         Print the manpath (see [1mman[22m([1m1[22m)) for the man pages for this version of Git and exit.
+
+     --info-path
+         Print the path where the Info files documenting this version of Git are installed and exit.
+
+     -p, --paginate
+         Pipe all output into [4mless[24m (or if set, $PAGER) if standard output is a terminal. This overrides the  [1mpager.[4m[22m<cmd>[24m  configuration  options  (see  the
+         "Configuration Mechanism" section below).
+
+     -P, --no-pager
+         Do not pipe Git output into a pager.
+
+     --git-dir=<path>
+         Set  the path to the repository (".git" directory). This can also be controlled by setting the [1mGIT_DIR [22menvironment variable. It can be an absolute
+         path or relative path to current working directory.
+
+         Specifying the location of the ".git" directory using this option (or [1mGIT_DIR [22menvironment variable) turns off the repository discovery that  tries
+         to  find  a  directory  with ".git" subdirectory (which is how the repository and the top-level of the working tree are discovered), and tells Git
+         that you are at the top level of the working tree. If you are not at the top-level directory of the working tree, you should tell  Git  where  the
+         top-level of the working tree is, with the [1m--work-tree=[4m[22m<path>[24m option (or [1mGIT_WORK_TREE [22menvironment variable)
+
+         If you just want to run git as if it was started in [4m<path>[24m then use [1mgit -C [4m[22m<path>[24m.
+
+     --work-tree=<path>
+         Set  the  path to the working tree. It can be an absolute path or a path relative to the current working directory. This can also be controlled by
+         setting the GIT_WORK_TREE environment variable and the core.worktree configuration variable (see core.worktree in [1mgit-config[22m(1)  for  a  more  de‐
+         tailed discussion).
+
+     --namespace=<path>
+         Set the Git namespace. See [1mgitnamespaces[22m(7) for more details. Equivalent to setting the [1mGIT_NAMESPACE [22menvironment variable.
+
+     --bare
+         Treat the repository as a bare repository. If GIT_DIR environment is not set, it is set to the current working directory.
+
+     --no-replace-objects
+         Do  not  use  replacement  refs  to  replace Git objects. This is equivalent to exporting the [1mGIT_NO_REPLACE_OBJECTS [22menvironment variable with any
+         value. See [1mgit-replace[22m(1) for more information.
+
+     --no-lazy-fetch
+         Do not fetch missing objects from the promisor remote on demand. Useful together with [1mgit cat-file -e [4m[22m<object>[24m to see if  the  object  is  locally
+         available. This is equivalent to setting the [1mGIT_NO_LAZY_FETCH [22menvironment variable to [1m1[22m.
+
+     --no-optional-locks
+         Do not perform optional operations that require locks. This is equivalent to setting the [1mGIT_OPTIONAL_LOCKS [22mto [1m0[22m.
+
+     --no-advice
+         Disable all advice hints from being printed.
+
+     --literal-pathspecs
+         Treat  pathspecs  literally (i.e. no globbing, no pathspec magic). This is equivalent to setting the [1mGIT_LITERAL_PATHSPECS [22menvironment variable to
+         [1m1[22m.
+
+     --glob-pathspecs
+         Add "glob" magic to all pathspec. This is equivalent to setting the [1mGIT_GLOB_PATHSPECS [22menvironment variable to [1m1[22m. Disabling globbing on individual
+         pathspecs can be done using pathspec magic ":(literal)"
+
+     --noglob-pathspecs
+         Add "literal" magic to all pathspec. This is equivalent to setting the [1mGIT_NOGLOB_PATHSPECS [22menvironment variable to [1m1[22m. Enabling globbing on  indi‐
+         vidual pathspecs can be done using pathspec magic ":(glob)"
+
+     --icase-pathspecs
+         Add "icase" magic to all pathspec. This is equivalent to setting the [1mGIT_ICASE_PATHSPECS [22menvironment variable to [1m1[22m.
+
+     --list-cmds=<group>[,<group>...]
+         List  commands  by  group.  This  is  an  internal/experimental option and may change or be removed in the future. Supported groups are: builtins,
+         parseopt (builtin commands that use parse-options), deprecated (deprecated builtins), main (all commands in libexec directory), others (all  other
+         commands  in  [1m$PATH  [22mthat  have git- prefix), list-<category> (see categories in command-list.txt), nohelpers (exclude helper commands), alias and
+         config (retrieve command list from config variable completion.commands)
+
+     --attr-source=<tree-ish>
+         Read gitattributes from <tree-ish> instead of the worktree. See [1mgitattributes[22m(5). This is equivalent to setting  the  [1mGIT_ATTR_SOURCE  [22menvironment
+         variable.
+
+[1mGIT COMMANDS[0m
+     We divide Git into high level ("porcelain") commands and low level ("plumbing") commands. For defining command aliases, see [1mgit-config[22m(1) and look for
+     descriptions of [1malias.*[22m. For installing custom "git" subcommands, see the description for the [4mPATH[24m environment variable in this manual.
+
+[1mHIGH-LEVEL COMMANDS (PORCELAIN)[0m
+     We separate the porcelain commands into the main commands and some ancillary user utilities.
+
+   [1mMain porcelain commands[0m
+     [1mgit-add[22m(1)
+         Add file contents to the index.
+
+     [1mgit-am[22m(1)
+         Apply a series of patches from a mailbox.
+
+     [1mgit-archive[22m(1)
+         Create an archive of files from a named tree.
+
+     [1mgit-backfill[22m(1)
+         Download missing objects in a partial clone.
+
+     [1mgit-bisect[22m(1)
+         Use binary search to find the commit that introduced a bug.
+
+     [1mgit-branch[22m(1)
+         List, create, or delete branches.
+
+     [1mgit-bundle[22m(1)
+         Move objects and refs by archive.
+
+     [1mgit-checkout[22m(1)
+         Switch branches or restore working tree files.
+
+     [1mgit-cherry-pick[22m(1)
+         Apply the changes introduced by some existing commits.
+
+     [1mgit-citool[22m(1)
+         Graphical alternative to git-commit.
+
+     [1mgit-clean[22m(1)
+         Remove untracked files from the working tree.
+
+     [1mgit-clone[22m(1)
+         Clone a repository into a new directory.
+
+     [1mgit-commit[22m(1)
+         Record changes to the repository.
+
+     [1mgit-describe[22m(1)
+         Give an object a human readable name based on an available ref.
+
+     [1mgit-diff[22m(1)
+         Show changes between commits, commit and working tree, etc.
+
+     [1mgit-fetch[22m(1)
+         Download objects and refs from another repository.
+
+     [1mgit-format-patch[22m(1)
+         Prepare patches for e-mail submission.
+
+     [1mgit-gc[22m(1)
+         Cleanup unnecessary files and optimize the local repository.
+
+     [1mgit-grep[22m(1)
+         Print lines matching a pattern.
+
+     [1mgit-gui[22m(1)
+         A portable graphical interface to Git.
+
+     [1mgit-history[22m(1)
+         EXPERIMENTAL: Rewrite history.
+
+     [1mgit-init[22m(1)
+         Create an empty Git repository or reinitialize an existing one.
+
+     [1mgit-log[22m(1)
+         Show commit logs.
+
+     [1mgit-maintenance[22m(1)
+         Run tasks to optimize Git repository data.
+
+     [1mgit-merge[22m(1)
+         Join two or more development histories together.
+
+     [1mgit-mv[22m(1)
+         Move or rename a file, a directory, or a symlink.
+
+     [1mgit-notes[22m(1)
+         Add or inspect object notes.
+
+     [1mgit-pull[22m(1)
+         Fetch from and integrate with another repository or a local branch.
+
+     [1mgit-push[22m(1)
+         Update remote refs along with associated objects.
+
+     [1mgit-range-diff[22m(1)
+         Compare two commit ranges (e.g. two versions of a branch).
+
+     [1mgit-rebase[22m(1)
+         Reapply commits on top of another base tip.
+
+     [1mgit-reset[22m(1)
+         Set [1mHEAD [22mor the index to a known state.
+
+     [1mgit-restore[22m(1)
+         Restore working tree files.
+
+     [1mgit-revert[22m(1)
+         Revert some existing commits.
+
+     [1mgit-rm[22m(1)
+         Remove files from the working tree and from the index.
+
+     [1mgit-shortlog[22m(1)
+         Summarize [4mgit[24m [4mlog[24m output.
+
+     [1mgit-show[22m(1)
+         Show various types of objects.
+
+     [1mgit-sparse-checkout[22m(1)
+         Reduce your working tree to a subset of tracked files.
+
+     [1mgit-stash[22m(1)
+         Stash the changes in a dirty working directory away.
+
+     [1mgit-status[22m(1)
+         Show the working tree status.
+
+     [1mgit-submodule[22m(1)
+         Initialize, update or inspect submodules.
+
+     [1mgit-switch[22m(1)
+         Switch branches.
+
+     [1mgit-tag[22m(1)
+         Create, list, delete or verify tags.
+
+     [1mgit-worktree[22m(1)
+         Manage multiple working trees.
+
+     [1mgitk[22m(1)
+         The Git repository browser.
+
+     [1mscalar[22m(1)
+         A tool for managing large Git repositories.
+
+   [1mAncillary Commands[0m
+     Manipulators:
+
+     [1mgit-config[22m(1)
+         Get and set repository or global options.
+
+     [1mgit-fast-export[22m(1)
+         Git data exporter.
+
+     [1mgit-fast-import[22m(1)
+         Backend for fast Git data importers.
+
+     [1mgit-filter-branch[22m(1)
+         Rewrite branches.
+
+     [1mgit-mergetool[22m(1)
+         Run merge conflict resolution tools to resolve merge conflicts.
+
+     [1mgit-pack-refs[22m(1)
+         Pack heads and tags for efficient repository access.
+
+     [1mgit-prune[22m(1)
+         Prune all unreachable objects from the object database.
+
+     [1mgit-reflog[22m(1)
+         Manage reflog information.
+
+     [1mgit-refs[22m(1)
+         Low-level access to refs.
+
+     [1mgit-remote[22m(1)
+         Manage set of tracked repositories.
+
+     [1mgit-repack[22m(1)
+         Pack unpacked objects in a repository.
+
+     [1mgit-replace[22m(1)
+         Create, list, delete refs to replace objects.
+
+     Interrogators:
+
+     [1mgit-annotate[22m(1)
+         Annotate file lines with commit information.
+
+     [1mgit-blame[22m(1)
+         Show what revision and author last modified each line of a file.
+
+     [1mgit-bugreport[22m(1)
+         Collect information for user to file a bug report.
+
+     [1mgit-count-objects[22m(1)
+         Count unpacked number of objects and their disk consumption.
+
+     [1mgit-diagnose[22m(1)
+         Generate a zip archive of diagnostic information.
+
+     [1mgit-difftool[22m(1)
+         Show changes using common diff tools.
+
+     [1mgit-fsck[22m(1)
+         Verifies the connectivity and validity of the objects in the database.
+
+     [1mgit-help[22m(1)
+         Display help information about Git.
+
+     [1mgit-instaweb[22m(1)
+         Instantly browse your working repository in gitweb.
+
+     [1mgit-merge-tree[22m(1)
+         Perform merge without touching index or working tree.
+
+     [1mgit-rerere[22m(1)
+         Reuse recorded resolution of conflicted merges.
+
+     [1mgit-show-branch[22m(1)
+         Show branches and their commits.
+
+     [1mgit-verify-commit[22m(1)
+         Check the GPG signature of commits.
+
+     [1mgit-verify-tag[22m(1)
+         Check the GPG signature of tags.
+
+     [1mgit-version[22m(1)
+         Display version information about Git.
+
+     [1mgit-whatchanged[22m(1)
+         Show logs with differences each commit introduces.
+
+     [1mgitweb[22m(1)
+         Git web interface (web frontend to Git repositories).
+
+   [1mInteracting with Others[0m
+     These commands are to interact with foreign SCM and with other people via patch over e-mail.
+
+     [1mgit-archimport[22m(1)
+         Import a GNU Arch repository into Git.
+
+     [1mgit-cvsexportcommit[22m(1)
+         Export a single commit to a CVS checkout.
+
+     [1mgit-cvsimport[22m(1)
+         Salvage your data out of another SCM people love to hate.
+
+     [1mgit-cvsserver[22m(1)
+         A CVS server emulator for Git.
+
+     [1mgit-imap-send[22m(1)
+         Send a collection of patches from stdin to an IMAP folder.
+
+     [1mgit-p4[22m(1)
+         Import from and submit to Perforce repositories.
+
+     [1mgit-quiltimport[22m(1)
+         Applies a quilt patchset onto the current branch.
+
+     [1mgit-request-pull[22m(1)
+         Generates a summary of pending changes.
+
+     [1mgit-send-email[22m(1)
+         Send a collection of patches as emails.
+
+     [1mgit-svn[22m(1)
+         Bidirectional operation between a Subversion repository and Git.
+
+   [1mReset, restore and revert[0m
+     There are three commands with similar names: [1mgit reset[22m, [1mgit restore [22mand [1mgit revert[22m.
+
+     •   [1mgit-revert[22m(1) is about making a new commit that reverts the changes made by other commits.
+
+     •   [1mgit-restore[22m(1) is about restoring files in the working tree from either the index or another commit. This command does not update your branch. The
+         command can also be used to restore files in the index from another commit.
+
+     •   [1mgit-reset[22m(1)  is  about  updating your branch, moving the tip in order to add or remove commits from the branch. This operation changes the commit
+         history.
+
+         [1mgit reset [22mcan also be used to restore the index, overlapping with [1mgit restore[22m.
+
+[1mLOW-LEVEL COMMANDS (PLUMBING)[0m
+     Although Git includes its own porcelain layer, its low-level commands are sufficient to support development of alternative porcelains.  Developers  of
+     such porcelains might start by reading about [1mgit-update-index[22m(1) and [1mgit-read-tree[22m(1).
+
+     The  interface  (input,  output,  set of options and the semantics) to these low-level commands are meant to be a lot more stable than Porcelain level
+     commands, because these commands are primarily for scripted use. The interface to Porcelain commands on the other hand are subject to change in  order
+     to improve the end user experience.
+
+     The  following description divides the low-level commands into commands that manipulate objects (in the repository, index, and working tree), commands
+     that interrogate and compare objects, and commands that move objects and references between repositories.
+
+   [1mManipulation commands[0m
+     [1mgit-apply[22m(1)
+         Apply a patch to files and/or to the index.
+
+     [1mgit-checkout-index[22m(1)
+         Copy files from the index to the working tree.
+
+     [1mgit-commit-graph[22m(1)
+         Write and verify Git commit-graph files.
+
+     [1mgit-commit-tree[22m(1)
+         Create a new commit object.
+
+     [1mgit-hash-object[22m(1)
+         Compute object ID and optionally create an object from a file.
+
+     [1mgit-index-pack[22m(1)
+         Build pack index file for an existing packed archive.
+
+     [1mgit-merge-file[22m(1)
+         Run a three-way file merge.
+
+     [1mgit-merge-index[22m(1)
+         Run a merge for files needing merging.
+
+     [1mgit-mktag[22m(1)
+         Creates a tag object with extra validation.
+
+     [1mgit-mktree[22m(1)
+         Build a tree-object from ls-tree formatted text.
+
+     [1mgit-multi-pack-index[22m(1)
+         Write and verify multi-pack-indexes.
+
+     [1mgit-pack-objects[22m(1)
+         Create a packed archive of objects.
+
+     [1mgit-prune-packed[22m(1)
+         Remove extra objects that are already in pack files.
+
+     [1mgit-read-tree[22m(1)
+         Reads tree information into the index.
+
+     [1mgit-replay[22m(1)
+         EXPERIMENTAL: Replay commits on a new base, works with bare repos too.
+
+     [1mgit-symbolic-ref[22m(1)
+         Read, modify and delete symbolic refs.
+
+     [1mgit-unpack-objects[22m(1)
+         Unpack objects from a packed archive.
+
+     [1mgit-update-index[22m(1)
+         Register file contents in the working tree to the index.
+
+     [1mgit-update-ref[22m(1)
+         Update the object name stored in a ref safely.
+
+     [1mgit-write-tree[22m(1)
+         Create a tree object from the current index.
+
+   [1mInterrogation commands[0m
+     [1mgit-cat-file[22m(1)
+         Provide contents or details of repository objects.
+
+     [1mgit-cherry[22m(1)
+         Find commits yet to be applied to upstream.
+
+     [1mgit-diff-files[22m(1)
+         Compares files in the working tree and the index.
+
+     [1mgit-diff-index[22m(1)
+         Compare a tree to the working tree or index.
+
+     [1mgit-diff-pairs[22m(1)
+         Compare the content and mode of provided blob pairs.
+
+     [1mgit-diff-tree[22m(1)
+         Compares the content and mode of blobs found via two tree objects.
+
+     [1mgit-for-each-ref[22m(1)
+         Output information on each ref.
+
+     [1mgit-for-each-repo[22m(1)
+         Run a Git command on a list of repositories.
+
+     [1mgit-get-tar-commit-id[22m(1)
+         Extract commit ID from an archive created using git-archive.
+
+     [1mgit-last-modified[22m(1)
+         EXPERIMENTAL: Show when files were last modified.
+
+     [1mgit-ls-files[22m(1)
+         Show information about files in the index and the working tree.
+
+     [1mgit-ls-remote[22m(1)
+         List references in a remote repository.
+
+     [1mgit-ls-tree[22m(1)
+         List the contents of a tree object.
+
+     [1mgit-merge-base[22m(1)
+         Find as good common ancestors as possible for a merge.
+
+     [1mgit-name-rev[22m(1)
+         Find symbolic names for given revs.
+
+     [1mgit-pack-redundant[22m(1)
+         Find redundant pack files.
+
+     [1mgit-repo[22m(1)
+         Retrieve information about the repository.
+
+     [1mgit-rev-list[22m(1)
+         Lists commit objects in reverse chronological order.
+
+     [1mgit-rev-parse[22m(1)
+         Pick out and massage parameters.
+
+     [1mgit-show-index[22m(1)
+         Show packed archive index.
+
+     [1mgit-show-ref[22m(1)
+         List references in a local repository.
+
+     [1mgit-unpack-file[22m(1)
+         Creates a temporary file with a blob’s contents.
+
+     [1mgit-var[22m(1)
+         Show a Git logical variable.
+
+     [1mgit-verify-pack[22m(1)
+         Validate packed Git archive files.
+
+     In general, the interrogate commands do not touch the files in the working tree.
+
+   [1mSyncing repositories[0m
+     [1mgit-daemon[22m(1)
+         A really simple server for Git repositories.
+
+     [1mgit-fetch-pack[22m(1)
+         Receive missing objects from another repository.
+
+     [1mgit-http-backend[22m(1)
+         Server side implementation of Git over HTTP.
+
+     [1mgit-send-pack[22m(1)
+         Push objects over Git protocol to another repository.
+
+     [1mgit-update-server-info[22m(1)
+         Update auxiliary info file to help dumb servers.
+
+     The following are helper commands used by the above; end users typically do not use them directly.
+
+     [1mgit-http-fetch[22m(1)
+         Download from a remote Git repository via HTTP.
+
+     [1mgit-http-push[22m(1)
+         Push objects over HTTP/DAV to another repository.
+
+     [1mgit-receive-pack[22m(1)
+         Receive what is pushed into the repository.
+
+     [1mgit-shell[22m(1)
+         Restricted login shell for Git-only SSH access.
+
+     [1mgit-upload-archive[22m(1)
+         Send archive back to git-archive.
+
+     [1mgit-upload-pack[22m(1)
+         Send objects packed back to git-fetch-pack.
+
+   [1mInternal helper commands[0m
+     These are internal helper commands used by other commands; end users typically do not use them directly.
+
+     [1mgit-check-attr[22m(1)
+         Display gitattributes information.
+
+     [1mgit-check-ignore[22m(1)
+         Debug gitignore / exclude files.
+
+     [1mgit-check-mailmap[22m(1)
+         Show canonical names and email addresses of contacts.
+
+     [1mgit-check-ref-format[22m(1)
+         Ensures that a reference name is well formed.
+
+     [1mgit-column[22m(1)
+         Display data in columns.
+
+     [1mgit-credential[22m(1)
+         Retrieve and store user credentials.
+
+     [1mgit-credential-cache[22m(1)
+         Helper to temporarily store passwords in memory.
+
+     [1mgit-credential-store[22m(1)
+         Helper to store credentials on disk.
+
+     [1mgit-fmt-merge-msg[22m(1)
+         Produce a merge commit message.
+
+     [1mgit-hook[22m(1)
+         Run git hooks.
+
+     [1mgit-interpret-trailers[22m(1)
+         Add or parse structured information in commit messages.
+
+     [1mgit-mailinfo[22m(1)
+         Extracts patch and authorship from a single e-mail message.
+
+     [1mgit-mailsplit[22m(1)
+         Simple UNIX mbox splitter program.
+
+     [1mgit-merge-one-file[22m(1)
+         The standard helper program to use with git-merge-index.
+
+     [1mgit-patch-id[22m(1)
+         Compute unique IDs for patches.
+
+     [1mgit-sh-i18n[22m(1)
+         Git’s i18n setup code for shell scripts.
+
+     [1mgit-sh-setup[22m(1)
+         Common Git shell script setup code.
+
+     [1mgit-stripspace[22m(1)
+         Remove unnecessary whitespace.
+
+[1mGUIDES[0m
+     The following documentation pages are guides about Git concepts.
+
+     [1mgitcore-tutorial[22m(7)
+         A Git core tutorial for developers.
+
+     [1mgitcredentials[22m(7)
+         Providing usernames and passwords to Git.
+
+     [1mgitcvs-migration[22m(7)
+         Git for CVS users.
+
+     [1mgitdiffcore[22m(7)
+         Tweaking diff output.
+
+     [1mgiteveryday[22m(7)
+         A useful minimum set of commands for Everyday Git.
+
+     [1mgitfaq[22m(7)
+         Frequently asked questions about using Git.
+
+     [1mgitglossary[22m(7)
+         A Git Glossary.
+
+     [1mgitnamespaces[22m(7)
+         Git namespaces.
+
+     [1mgitremote-helpers[22m(7)
+         Helper programs to interact with remote repositories.
+
+     [1mgitsubmodules[22m(7)
+         Mounting one repository inside another.
+
+     [1mgittutorial[22m(7)
+         A tutorial introduction to Git.
+
+     [1mgittutorial-2[22m(7)
+         A tutorial introduction to Git: part two.
+
+     [1mgitworkflows[22m(7)
+         An overview of recommended workflows with Git.
+
+[1mREPOSITORY, COMMAND AND FILE INTERFACES[0m
+     This documentation discusses repository and command interfaces which users are expected to interact with directly. See [1m--user-formats  [22min  [1mgit-help[22m(1)
+     for more details on the criteria.
+
+     [1mgitattributes[22m(5)
+         Defining attributes per path.
+
+     [1mgitcli[22m(7)
+         Git command-line interface and conventions.
+
+     [1mgithooks[22m(5)
+         Hooks used by Git.
+
+     [1mgitignore[22m(5)
+         Specifies intentionally untracked files to ignore.
+
+     [1mgitmailmap[22m(5)
+         Map author/committer names and/or E-Mail addresses.
+
+     [1mgitmodules[22m(5)
+         Defining submodule properties.
+
+     [1mgitrepository-layout[22m(5)
+         Git Repository Layout.
+
+     [1mgitrevisions[22m(7)
+         Specifying revisions and ranges for Git.
+
+[1mFILE FORMATS, PROTOCOLS AND OTHER DEVELOPER INTERFACES[0m
+     This documentation discusses file formats, over-the-wire protocols and other git developer interfaces. See [1m--developer-interfaces [22min [1mgit-help[22m(1).
+
+     [1mgitformat-bundle[22m(5)
+         The bundle file format.
+
+     [1mgitformat-chunk[22m(5)
+         Chunk-based file formats.
+
+     [1mgitformat-commit-graph[22m(5)
+         Git commit-graph format.
+
+     [1mgitformat-index[22m(5)
+         Git index format.
+
+     [1mgitformat-pack[22m(5)
+         Git pack format.
+
+     [1mgitformat-signature[22m(5)
+         Git cryptographic signature formats.
+
+     [1mgitprotocol-capabilities[22m(5)
+         Protocol v0 and v1 capabilities.
+
+     [1mgitprotocol-common[22m(5)
+         Things common to various protocols.
+
+     [1mgitprotocol-http[22m(5)
+         Git HTTP-based protocols.
+
+     [1mgitprotocol-pack[22m(5)
+         How packs are transferred over-the-wire.
+
+     [1mgitprotocol-v2[22m(5)
+         Git Wire Protocol, Version 2.
+
+[1mCONFIGURATION MECHANISM[0m
+     Git uses a simple text format to store customizations that are per repository and are per user. Such a configuration file may look like this:
+
+         #
+         # A '#' or ';' character indicates a comment.
+         #
+
+         ; core variables
+         [core]
+                 ; Don't trust file modes
+                 filemode = false
+
+         ; user identity
+         [user]
+                 name = "Junio C Hamano"
+                 email = "gitster@pobox.com"
+
+     Various commands read from the configuration file and adjust their operation accordingly. See [1mgit-config[22m(1) for a list and more details about the con‐
+     figuration mechanism.
+
+[1mIDENTIFIER TERMINOLOGY[0m
+     <object>
+         Indicates the object name for any type of object.
+
+     <blob>
+         Indicates a blob object name.
+
+     <tree>
+         Indicates a tree object name.
+
+     <commit>
+         Indicates a commit object name.
+
+     <tree-ish>
+         Indicates  a  tree, commit or tag object name. A command that takes a <tree-ish> argument ultimately wants to operate on a <tree> object but auto‐
+         matically dereferences <commit> and <tag> objects that point at a <tree>.
+
+     <commit-ish>
+         Indicates a commit or tag object name. A command that takes a <commit-ish> argument ultimately wants to operate on a <commit> object but automati‐
+         cally dereferences <tag> objects that point at a <commit>.
+
+     <type>
+         Indicates that an object type is required. Currently one of: [1mblob[22m, [1mtree[22m, [1mcommit[22m, or [1mtag[22m.
+
+     <file>
+         Indicates a filename - almost always relative to the root of the tree structure [1mGIT_INDEX_FILE [22mdescribes.
+
+[1mSYMBOLIC IDENTIFIERS[0m
+     Any Git command accepting any <object> can also use the following symbolic notation:
+
+     HEAD
+         indicates the head of the current branch.
+
+     <tag>
+         a valid tag [4mname[24m (i.e. a [1mrefs/tags/[4m[22m<tag>[24m reference).
+
+     <head>
+         a valid head [4mname[24m (i.e. a [1mrefs/heads/[4m[22m<head>[24m reference).
+
+     For a more complete list of ways to spell object names, see "SPECIFYING REVISIONS" section in [1mgitrevisions[22m(7).
+
+[1mFILE/DIRECTORY STRUCTURE[0m
+     Please see the [1mgitrepository-layout[22m(5) document.
+
+     Read [1mgithooks[22m(5) for more details about each hook.
+
+     Higher level SCMs may provide and manage additional information in the [1m$GIT_DIR[22m.
+
+[1mTERMINOLOGY[0m
+     Please see [1mgitglossary[22m(7).
+
+[1mENVIRONMENT VARIABLES[0m
+     Various Git commands pay attention to environment variables and change their behavior. The environment variables marked as "Boolean" take their values
+     the same way as Boolean valued configuration variables, i.e., "true", "yes", "on" and positive numbers are taken as "yes", while "false", "no", "off",
+     and "0" are taken as "no".
+
+     Here are the variables:
+
+   [1mSystem[0m
+     [1mHOME[0m
+         Specifies the path to the user’s home directory. On Windows, if unset, Git will set a process environment variable equal  to:  [1m$HOMEDRIVE$HOMEPATH[0m
+         if both [1m$HOMEDRIVE [22mand [1m$HOMEPATH [22mexist; otherwise [1m$USERPROFILE [22mif [1m$USERPROFILE [22mexists.
+
+     [1mPATH[0m
+         When  a user runs [4mgit[24m [4m<command>[24m that is not part of the core Git programs (installed in GIT_EXEC_PATH), [4mgit-<command>[24m that is runnable by the user
+         in a directory on [1m$PATH [22mis invoked. Argument passed after the command name are passed as-is to the program. To execute [1mgit [4m[22m<foo>[24m, [1mgit  [22mfinds  com‐
+         mand [4m<foo>[24m (either a core Git program found in [4mGIT_EXEC_PATH[24m, or a custom one in a directory on [4mPATH[24m), before trying [1mfoo [22mas an alias.
+
+   [1mThe Git Repository[0m
+     These  environment variables apply to [4mall[24m core Git commands. Nb: it is worth noting that they may be used/overridden by SCMS sitting above Git so take
+     care if using a foreign front-end.
+
+     [1mGIT_INDEX_FILE[0m
+         This environment variable specifies an alternate index file. If not specified, the default of [1m$GIT_DIR/index [22mis used.
+
+     [1mGIT_INDEX_VERSION[0m
+         This environment variable specifies what index version is used when writing the index file out. It won’t affect existing index files.  By  default
+         index file version 2 or 3 is used. See [1mgit-update-index[22m(1) for more information.
+
+     [1mGIT_OBJECT_DIRECTORY[0m
+         If  the  object  storage directory is specified via this environment variable then the sha1 directories are created underneath - otherwise the de‐
+         fault [1m$GIT_DIR/objects [22mdirectory is used.
+
+     [1mGIT_ALTERNATE_OBJECT_DIRECTORIES[0m
+         Due to the immutable nature of Git objects, old objects can be archived into shared, read-only directories. This variable specifies  a  ":"  sepa‐
+         rated  (on  Windows  ";" separated) list of Git object directories which can be used to search for Git objects. New objects will not be written to
+         these directories.
+
+         Entries that begin with " (double-quote) will be interpreted as C-style quoted paths, removing leading and trailing double-quotes  and  respecting
+         backslash escapes. E.g., the value "path-with-\"-and-:-in-it":vanilla-path has two paths: [1mpath-with-[22m"-and-:-in-it and [1mvanilla-path[22m.
+
+     [1mGIT_DIR[0m
+         If  the  [1mGIT_DIR  [22menvironment  variable  is  set  then  it specifies a path to use instead of the default [1m.git [22mfor the base of the repository. The
+         [1m--git-dir [22mcommand-line option also sets this value.
+
+     [1mGIT_WORK_TREE[0m
+         Set the path to the root of the working tree. This can also be controlled by the [1m--work-tree [22mcommand-line option and the core.worktree  configura‐
+         tion variable.
+
+     [1mGIT_NAMESPACE[0m
+         Set the Git namespace; see [1mgitnamespaces[22m(7) for details. The [1m--namespace [22mcommand-line option also sets this value.
+
+     [1mGIT_CEILING_DIRECTORIES[0m
+         This should be a colon-separated list of absolute paths. If set, it is a list of directories that Git should not chdir up into while looking for a
+         repository  directory  (useful for excluding slow-loading network directories). It will not exclude the current working directory or a GIT_DIR set
+         on the command line or in the environment. Normally, Git has to read the entries in this list and resolve any symlink that might be present in or‐
+         der to compare them with the current directory. However, if even this access is slow, you can add an empty entry to the list to tell Git that  the
+         subsequent entries are not symlinks and needn’t be resolved; e.g., [1mGIT_CEILING_DIRECTORIES=/maybe/symlink::/very/slow/non/symlink[22m.
+
+     [1mGIT_DISCOVERY_ACROSS_FILESYSTEM[0m
+         When  run  in a directory that does not have ".git" repository directory, Git tries to find such a directory in the parent directories to find the
+         top of the working tree, but by default it does not cross filesystem boundaries. This Boolean environment variable can be set to true to tell  Git
+         not  to  stop  at filesystem boundaries. Like [1mGIT_CEILING_DIRECTORIES[22m, this will not affect an explicit repository directory set via [1mGIT_DIR [22mor on
+         the command line.
+
+     [1mGIT_COMMON_DIR[0m
+         If this variable is set to a path, non-worktree files that are normally in $GIT_DIR will be taken from this path instead. Worktree-specific  files
+         such  as  HEAD  or  index are taken from $GIT_DIR. See [1mgitrepository-layout[22m(5) and [1mgit-worktree[22m(1) for details. This variable has lower precedence
+         than other path variables such as GIT_INDEX_FILE, GIT_OBJECT_DIRECTORY...
+
+     [1mGIT_DEFAULT_HASH[0m
+         If this variable is set, the default hash algorithm for new repositories will be set to this value. This value is ignored  when  cloning  and  the
+         setting of the remote repository is always used. The default is "sha1". See [1m--object-format [22min [1mgit-init[22m(1).
+
+     [1mGIT_DEFAULT_REF_FORMAT[0m
+         If  this  variable  is  set,  the  default  reference  backend  format for new repositories will be set to this value. The default is "files". See
+         [1m--ref-format [22min [1mgit-init[22m(1).
+
+     [1mGIT_REFERENCE_BACKEND[0m
+         Specify which reference backend to be used along with its URI. See [1mextensions.refStorage [22moption in [1mgit-config[22m(1) for more details.  Overrides  the
+         config variable when used.
+
+   [1mGit Commits[0m
+     [1mGIT_AUTHOR_NAME[0m
+         The  human-readable name used in the author identity when creating commit or tag objects, or when writing reflogs. Overrides the [1muser.name [22mand [1mau‐[0m
+         [1mthor.name [22mconfiguration settings.
+
+     [1mGIT_AUTHOR_EMAIL[0m
+         The email address used in the author identity when creating commit or tag objects, or when writing  reflogs.  Overrides  the  [1muser.email  [22mand  [1mau‐[0m
+         [1mthor.email [22mconfiguration settings.
+
+     [1mGIT_AUTHOR_DATE[0m
+         The date used for the author identity when creating commit or tag objects, or when writing reflogs. See [1mgit-commit[22m(1) for valid formats.
+
+     [1mGIT_COMMITTER_NAME[0m
+         The  human-readable  name used in the committer identity when creating commit or tag objects, or when writing reflogs. Overrides the [1muser.name [22mand
+         [1mcommitter.name [22mconfiguration settings.
+
+     [1mGIT_COMMITTER_EMAIL[0m
+         The email address used in the author identity when creating commit or tag objects, or when writing reflogs. Overrides the [1muser.email  [22mand  [1mcommit‐[0m
+         [1mter.email [22mconfiguration settings.
+
+     [1mGIT_COMMITTER_DATE[0m
+         The date used for the committer identity when creating commit or tag objects, or when writing reflogs. See [1mgit-commit[22m(1) for valid formats.
+
+     [1mEMAIL[0m
+         The email address used in the author and committer identities if no other relevant environment variable or configuration setting has been set.
+
+   [1mGit Diffs[0m
+     [1mGIT_DIFF_OPTS[0m
+         Only valid setting is "--unified=??" or "-u??" to set the number of context lines shown when a unified diff is created. This takes precedence over
+         any "-U" or "--unified" option value passed on the Git diff command line.
+
+     [1mGIT_EXTERNAL_DIFF[0m
+         When the environment variable [1mGIT_EXTERNAL_DIFF [22mis set, the program named by it is called to generate diffs, and Git does not use its builtin diff
+         machinery. For a path that is added, removed, or modified, [1mGIT_EXTERNAL_DIFF [22mis called with 7 parameters:
+
+             path old-file old-hex old-mode new-file new-hex new-mode
+
+         where:
+
+     <old|new>-file
+         are files GIT_EXTERNAL_DIFF can use to read the contents of <old|new>,
+
+     <old|new>-hex
+         are the 40-hexdigit SHA-1 hashes,
+
+     <old|new>-mode
+         are the octal representation of the file modes.
+
+         The  file  parameters  can  point  at  the  user’s working file (e.g.  [1mnew-file [22min "git-diff-files"), [1m/dev/null [22m(e.g.  [1mold-file [22mwhen a new file is
+         added), or a temporary file (e.g.  [1mold-file [22min the index).  [1mGIT_EXTERNAL_DIFF [22mshould not worry about unlinking the temporary file —— it is removed
+         when [1mGIT_EXTERNAL_DIFF [22mexits.
+
+         For a path that is unmerged, [1mGIT_EXTERNAL_DIFF [22mis called with 1 parameter, <path>.
+
+         For each path [1mGIT_EXTERNAL_DIFF [22mis called, two environment variables, [1mGIT_DIFF_PATH_COUNTER [22mand [1mGIT_DIFF_PATH_TOTAL [22mare set.
+
+     [1mGIT_EXTERNAL_DIFF_TRUST_EXIT_CODE[0m
+         If this Boolean environment variable is set to true then the [1mGIT_EXTERNAL_DIFF [22mcommand is expected to return exit code 0 if it considers the input
+         files to be equal or 1 if it considers them to be different, like [1mdiff[22m([1m1[22m). If it is set to false, which is the default, then the  command  is  ex‐
+         pected to return exit code 0 regardless of equality. Any other exit code causes Git to report a fatal error.
+
+     [1mGIT_DIFF_PATH_COUNTER[0m
+         A 1-based counter incremented by one for every path.
+
+     [1mGIT_DIFF_PATH_TOTAL[0m
+         The total number of paths.
+
+   [1mother[0m
+     [1mGIT_MERGE_VERBOSITY[0m
+         A number controlling the amount of output shown by the recursive merge strategy. Overrides merge.verbosity. See [1mgit-merge[22m(1)
+
+     [1mGIT_PAGER[0m
+         This  environment  variable  overrides  [1m$PAGER[22m.  If  it is set to an empty string or to the value "cat", Git will not launch a pager. See also the
+         [1mcore.pager [22moption in [1mgit-config[22m(1).
+
+     [1mGIT_PROGRESS_DELAY[0m
+         A number controlling how many seconds to delay before showing optional progress indicators. Defaults to 1.
+
+     [1mGIT_EDITOR[0m
+         This environment variable overrides [1m$EDITOR [22mand [1m$VISUAL[22m. It is used by several Git commands  when,  on  interactive  mode,  an  editor  is  to  be
+         launched. See also [1mgit-var[22m(1) and the [1mcore.editor [22moption in [1mgit-config[22m(1).
+
+     [1mGIT_SEQUENCE_EDITOR[0m
+         This  environment variable overrides the configured Git editor when editing the todo list of an interactive rebase. See also [1mgit-rebase[22m(1) and the
+         [1msequence.editor [22moption in [1mgit-config[22m(1).
+
+     [1mGIT_SSH[22m, [1mGIT_SSH_COMMAND[0m
+         If either of these environment variables is set then [4mgit[24m [4mfetch[24m and [4mgit[24m [4mpush[24m will use the specified command instead of [4mssh[24m when they need  to  con‐
+         nect to a remote system. The command-line parameters passed to the configured command are determined by the ssh variant. See [1mssh.variant [22moption in
+         [1mgit-config[22m(1) for details.
+
+         [1m$GIT_SSH_COMMAND  [22mtakes  precedence over [1m$GIT_SSH[22m, and is interpreted by the shell, which allows additional arguments to be included.  [1m$GIT_SSH [22mon
+         the other hand must be just the path to a program (which can be a wrapper shell script, if additional arguments are needed).
+
+         Usually it is easier to configure any desired options through your personal [1m.ssh/config [22mfile. Please consult your ssh  documentation  for  further
+         details.
+
+     [1mGIT_SSH_VARIANT[0m
+         If  this  environment variable is set, it overrides Git’s autodetection whether [1mGIT_SSH[22m/[1mGIT_SSH_COMMAND[22m/[1mcore.sshCommand [22mrefer to OpenSSH, plink or
+         tortoiseplink. This variable overrides the config setting [1mssh.variant [22mthat serves the same purpose.
+
+     [1mGIT_SSL_NO_VERIFY[0m
+         Setting and exporting this environment variable to any value tells Git not to verify the SSL certificate when fetching or pushing over HTTPS.
+
+     [1mGIT_ATTR_SOURCE[0m
+         Sets the treeish that gitattributes will be read from.
+
+     [1mGIT_ASKPASS[0m
+         If this environment variable is set, then Git commands which need to acquire passwords or passphrases (e.g. for HTTP or IMAP authentication)  will
+         call  this program with a suitable prompt as command-line argument and read the password from its STDOUT. See also the [1mcore.askPass [22moption in [1mgit-[0m
+         [1mconfig[22m(1).
+
+     [1mGIT_TERMINAL_PROMPT[0m
+         If this Boolean environment variable is set to false, git will not prompt on the terminal (e.g., when asking for HTTP authentication).
+
+     [1mGIT_CONFIG_GLOBAL[22m, [1mGIT_CONFIG_SYSTEM[0m
+         Take the configuration from the given files instead from global or system-level configuration files. If [1mGIT_CONFIG_SYSTEM [22mis set, the system  con‐
+         fig  file  defined  at  build  time (usually [1m/etc/gitconfig[22m) will not be read. Likewise, if [1mGIT_CONFIG_GLOBAL [22mis set, neither [1m$HOME/.gitconfig [22mnor
+         [1m$XDG_CONFIG_HOME/git/config [22mwill be read. Can be set to [1m/dev/null [22mto skip reading configuration files of the respective level.
+
+     [1mGIT_CONFIG_NOSYSTEM[0m
+         Whether to skip reading settings from the system-wide [1m$[22m([1mprefix[22m)[1m/etc/gitconfig [22mfile. This Boolean environment variable can be used along with [1m$HOME[0m
+         and [1m$XDG_CONFIG_HOME [22mto create a predictable environment for a picky script, or you can set  it  to  true  to  temporarily  avoid  using  a  buggy
+         [1m/etc/gitconfig [22mfile while waiting for someone with sufficient permissions to fix it.
+
+     [1mGIT_FLUSH[0m
+         If  this Boolean environment variable is set to true, then commands such as [4mgit[24m [4mblame[24m (in incremental mode), [4mgit[24m [4mrev-list[24m, [4mgit[24m [4mlog[24m, [4mgit[24m [4mcheck-attr[0m
+         and [4mgit[24m [4mcheck-ignore[24m will force a flush of the output stream after each record have been flushed. If this variable is set to false, the output  of
+         these  commands  will  be done using completely buffered I/O. If this environment variable is not set, Git will choose buffered or record-oriented
+         flushing based on whether stdout appears to be redirected to a file or not.
+
+     [1mGIT_TRACE[0m
+         Enables general trace messages, e.g. alias expansion, built-in command execution and external command execution.
+
+         If this variable is set to "1", "2" or "true" (comparison is case insensitive), trace messages will be printed to stderr.
+
+         If the variable is set to an integer value greater than 2 and lower than 10 (strictly) then Git will interpret this value as an open file descrip‐
+         tor and will try to write the trace messages into this file descriptor.
+
+         Alternatively, if the variable is set to an absolute path (starting with a [4m/[24m character), Git will interpret this as a file path and  will  try  to
+         append the trace messages to it.
+
+         Unsetting the variable, or setting it to empty, "0" or "false" (case insensitive) disables trace messages.
+
+     [1mGIT_TRACE_FSMONITOR[0m
+         Enables trace messages for the filesystem monitor extension. See [1mGIT_TRACE [22mfor available trace output options.
+
+     [1mGIT_TRACE_PACK_ACCESS[0m
+         Enables trace messages for all accesses to any packs. For each access, the pack file name and an offset in the pack is recorded. This may be help‐
+         ful for troubleshooting some pack-related performance problems. See [1mGIT_TRACE [22mfor available trace output options.
+
+     [1mGIT_TRACE_PACKET[0m
+         Enables  trace messages for all packets coming in or out of a given program. This can help with debugging object negotiation or other protocol is‐
+         sues. Tracing is turned off at a packet starting with "PACK" (but see [1mGIT_TRACE_PACKFILE [22mbelow). See [1mGIT_TRACE [22mfor available trace output options.
+
+     [1mGIT_TRACE_PACKFILE[0m
+         Enables tracing of packfiles sent or received by a given program. Unlike other trace output, this trace is verbatim: no headers, and no quoting of
+         binary data. You almost certainly want to direct into a file (e.g., [1mGIT_TRACE_PACKFILE=/tmp/my.pack[22m) rather than displaying it on the terminal  or
+         mixing it with other trace output.
+
+         Note that this is currently only implemented for the client side of clones and fetches.
+
+     [1mGIT_TRACE_PERFORMANCE[0m
+         Enables performance related trace messages, e.g. total execution time of each Git command. See [1mGIT_TRACE [22mfor available trace output options.
+
+     [1mGIT_TRACE_REFS[0m
+         Enables trace messages for operations on the ref database. See [1mGIT_TRACE [22mfor available trace output options.
+
+     [1mGIT_TRACE_SETUP[0m
+         Enables  trace  messages  printing the .git, working tree and current working directory after Git has completed its setup phase. See [1mGIT_TRACE [22mfor
+         available trace output options.
+
+     [1mGIT_TRACE_SHALLOW[0m
+         Enables trace messages that can help debugging fetching / cloning of shallow repositories. See [1mGIT_TRACE [22mfor available trace output options.
+
+     [1mGIT_TRACE_CURL[0m
+         Enables a curl full trace dump of all incoming and outgoing data, including descriptive information, of the git transport protocol. This is  simi‐
+         lar to doing curl [1m--trace-ascii [22mon the command line. See [1mGIT_TRACE [22mfor available trace output options.
+
+     [1mGIT_TRACE_CURL_NO_DATA[0m
+         When a curl trace is enabled (see [1mGIT_TRACE_CURL [22mabove), do not dump data (that is, only dump info lines and headers).
+
+     [1mGIT_TRACE2[0m
+         Enables more detailed trace messages from the "trace2" library. Output from [1mGIT_TRACE2 [22mis a simple text-based format for human readability.
+
+         If this variable is set to "1", "2" or "true" (comparison is case insensitive), trace messages will be printed to stderr.
+
+         If the variable is set to an integer value greater than 2 and lower than 10 (strictly) then Git will interpret this value as an open file descrip‐
+         tor and will try to write the trace messages into this file descriptor.
+
+         Alternatively,  if  the  variable is set to an absolute path (starting with a [4m/[24m character), Git will interpret this as a file path and will try to
+         append the trace messages to it. If the path already exists and is a directory, the trace messages will be written to files (one per  process)  in
+         that directory, named according to the last component of the SID and an optional counter (to avoid filename collisions).
+
+         In  addition,  if  the  variable is set to [1maf_unix:[22m[[4m<socket-type>[24m[1m:[22m][4m<absolute-pathname>[24m, Git will try to open the path as a Unix Domain Socket. The
+         socket type can be either [1mstream [22mor [1mdgram[22m.
+
+         Unsetting the variable, or setting it to empty, "0" or "false" (case insensitive) disables trace messages.
+
+         See [34m[1mTrace2 documentation[0m[1m[22m[2] for full details.
+
+     [1mGIT_TRACE2_EVENT[0m
+         This setting writes a JSON-based format that is suited for machine interpretation. See [1mGIT_TRACE2 [22mfor available trace output  options  and  [34m[1mTrace2[0m
+         [1m[34mdocumentation[0m[1m[22m[2] for full details.
+
+     [1mGIT_TRACE2_PERF[0m
+         In  addition  to the text-based messages available in [1mGIT_TRACE2[22m, this setting writes a column-based format for understanding nesting regions. See
+         [1mGIT_TRACE2 [22mfor available trace output options and [34m[1mTrace2 documentation[0m[1m[22m[2] for full details.
+
+     [1mGIT_TRACE_REDACT[0m
+         By default, when tracing is activated, Git redacts the values of cookies, the "Authorization:" header, the "Proxy-Authorization:" header and pack‐
+         file URIs. Set this Boolean environment variable to false to prevent this redaction.
+
+     [1mGIT_NO_REPLACE_OBJECTS[0m
+         Setting and exporting this environment variable tells Git to ignore replacement refs and do not replace Git objects.
+
+     [1mGIT_LITERAL_PATHSPECS[0m
+         Setting this Boolean environment variable to true will cause Git to treat all pathspecs literally, rather than as glob patterns. For example, run‐
+         ning [1mGIT_LITERAL_PATHSPECS=1 git log -- [22m'*.c' will search for commits that touch the path [1m*.c[22m, not any paths that the glob [1m*.c [22mmatches. You  might
+         want this if you are feeding literal paths to Git (e.g., paths previously given to you by [1mgit ls-tree[22m, [1m--raw [22mdiff output, etc).
+
+     [1mGIT_GLOB_PATHSPECS[0m
+         Setting this Boolean environment variable to true will cause Git to treat all pathspecs as glob patterns (aka "glob" magic).
+
+     [1mGIT_NOGLOB_PATHSPECS[0m
+         Setting this Boolean environment variable to true will cause Git to treat all pathspecs as literal (aka "literal" magic).
+
+     [1mGIT_ICASE_PATHSPECS[0m
+         Setting this Boolean environment variable to true will cause Git to treat all pathspecs as case-insensitive.
+
+     [1mGIT_NO_LAZY_FETCH[0m
+         Setting this Boolean environment variable to true tells Git not to lazily fetch missing objects from the promisor remote on demand.
+
+     [1mGIT_REFLOG_ACTION[0m
+         When  a  ref  is  updated,  reflog  entries  are  created  to keep track of the reason why the ref was updated (which is typically the name of the
+         high-level command that updated the ref), in addition to the old and new values of the ref. A scripted Porcelain command can use set_reflog_action
+         helper function in [1mgit-sh-setup [22mto set its name to this variable when it is invoked as the top level command by the end user, to  be  recorded  in
+         the body of the reflog.
+
+     [1mGIT_REF_PARANOIA[0m
+         If  this  Boolean environment variable is set to false, ignore broken or badly named refs when iterating over lists of refs. Normally Git will try
+         to include any such refs, which may cause some operations to fail. This is usually preferable, as potentially destructive operations  (e.g.,  [1mgit-[0m
+         [1mprune[22m(1))  are  better off aborting rather than ignoring broken refs (and thus considering the history they point to as not worth saving). The de‐
+         fault value is [1m1 [22m(i.e., be paranoid about detecting and aborting all operations). You should not normally need to set this to [1m0[22m,  but  it  may  be
+         useful when trying to salvage data from a corrupted repository.
+
+     [1mGIT_COMMIT_GRAPH_PARANOIA[0m
+         When  loading  a  commit object from the commit-graph, Git performs an existence check on the object in the object database. This is done to avoid
+         issues with stale commit-graphs that contain references to already-deleted commits, but comes with a performance penalty.
+
+         The default is "false", which disables the aforementioned behavior. Setting this to "true" enables the existence check so that stale commits  will
+         never be returned from the commit-graph at the cost of performance.
+
+     [1mGIT_ALLOW_PROTOCOL[0m
+         If  set  to  a  colon-separated  list  of  protocols,  behave  as  if  [1mprotocol.allow [22mis set to [1mnever[22m, and each of the listed protocols has [1mproto‐[0m
+         [1mcol.[4m[22m<name>[24m[1m.allow [22mset to [1malways [22m(overriding any existing configuration). See the description of [1mprotocol.allow [22min [1mgit-config[22m(1) for more details.
+
+     [1mGIT_PROTOCOL_FROM_USER[0m
+         Set this Boolean environment variable to false to prevent protocols used by fetch/push/clone which are configured to the [1muser [22mstate. This is  use‐
+         ful  to restrict recursive submodule initialization from an untrusted repository or for programs which feed potentially-untrusted URLS to git com‐
+         mands. See [1mgit-config[22m(1) for more details.
+
+     [1mGIT_PROTOCOL[0m
+         For internal use only. Used in handshaking the wire protocol. Contains a colon [4m:[24m separated list of  keys  with  optional  values  [4m<key>[=<value>][24m.
+         Presence of unknown keys and values must be ignored.
+
+         Note  that servers may need to be configured to allow this variable to pass over some transports. It will be propagated automatically when access‐
+         ing local repositories (i.e., [1mfile:// [22mor a filesystem path), as well as over the [1mgit:// [22mprotocol. For git-over-http, it should work  automatically
+         in most configurations, but see the discussion in [1mgit-http-backend[22m(1). For git-over-ssh, the ssh server may need to be configured to allow clients
+         to pass this variable (e.g., by using [1mAcceptEnv GIT_PROTOCOL [22mwith OpenSSH).
+
+         This  configuration is optional. If the variable is not propagated, then clients will fall back to the original "v0" protocol (but may miss out on
+         some performance improvements or features). This variable currently only affects clones and fetches; it is not yet used for pushes (but may be  in
+         the future).
+
+     [1mGIT_OPTIONAL_LOCKS[0m
+         If  this  Boolean  environment  variable is set to false, Git will complete any requested operation without performing any optional sub-operations
+         that require taking a lock. For example, this will prevent [1mgit status [22mfrom refreshing the index as a side effect. This  is  useful  for  processes
+         running in the background which do not want to cause lock contention with other operations on the repository. Defaults to [1m1[22m.
+
+     [1mGIT_REDIRECT_STDIN[22m, [1mGIT_REDIRECT_STDOUT[22m, [1mGIT_REDIRECT_STDERR[0m
+         Windows-only: allow redirecting the standard input/output/error handles to paths specified by the environment variables. This is particularly use‐
+         ful  in multi-threaded applications where the canonical way to pass standard handles via [1mCreateProcess[22m() is not an option because it would require
+         the handles to be marked inheritable (and consequently [1mevery [22mspawned process would inherit them, possibly blocking regular  Git  operations).  The
+         primary intended use case is to use named pipes for communication (e.g.  [1m\\.\pipe\my-git-stdin-123[22m).
+
+         Two special values are supported: [1moff [22mwill simply close the corresponding standard handle, and if [1mGIT_REDIRECT_STDERR [22mis [1m2[22m>&1, standard error will
+         be redirected to the same handle as standard output.
+
+     [1mGIT_PRINT_SHA1_ELLIPSIS [22m(deprecated)
+         If  set to [1myes[22m, print an ellipsis following an (abbreviated) SHA-1 value. This affects indications of detached HEADs ([1mgit-checkout[22m(1)) and the raw
+         diff output ([1mgit-diff[22m(1)). Printing an ellipsis in the cases mentioned is no longer considered adequate and support for it is likely to be removed
+         in the foreseeable future (along with the variable).
+
+     [1mGIT_ADVICE[0m
+         If set to [1m0[22m, then disable all advice messages. These messages are intended to provide hints to human users that may help them get out of  problem‐
+         atic  situations  or  take advantage of new features. Users can disable individual messages using the [1madvice.*  [22mconfig keys. These messages may be
+         disruptive to tools that execute Git processes, so this variable is available to disable the messages. (The  [1m--no-advice  [22mglobal  option  is  also
+         available,  but old Git versions may fail when this option is not understood. The environment variable will be ignored by Git versions that do not
+         understand it.)
+
+[1mDISCUSSION[0m
+     More detail on the following is available from the [34m[1mGit concepts chapter of the user-manual[0m[1m[22m[3] and [1mgitcore-tutorial[22m(7).
+
+     A Git project normally consists of a working directory with a ".git" subdirectory at the top level. The .git directory contains, among other things, a
+     compressed object database representing the complete history of the project, an "index" file which links that history to the current contents  of  the
+     working tree, and named pointers into that history such as tags and branch heads.
+
+     The  object database contains objects of three main types: blobs, which hold file data; trees, which point to blobs and other trees to build up direc‐
+     tory hierarchies; and commits, which each reference a single tree and some number of parent commits.
+
+     The commit, equivalent to what other systems call a "changeset" or "version", represents a step in the project’s history, and each  parent  represents
+     an immediately preceding step. Commits with more than one parent represent merges of independent lines of development.
+
+     All  objects  are named by the SHA-1 hash of their contents, normally written as a string of 40 hex digits. Such names are globally unique. The entire
+     history leading up to a commit can be vouched for by signing just that commit. A fourth object type, the tag, is provided for this purpose.
+
+     When first created, objects are stored in individual files, but for efficiency may later be compressed together into "pack files".
+
+     Named pointers called refs mark interesting points in history. A ref may contain the SHA-1 name of an object or the name of another ref (the latter is
+     called a "symbolic ref"). Refs with names beginning [1mrefs/head/ [22mcontain the SHA-1 name of the most recent commit (or "head") of a branch under develop‐
+     ment. SHA-1 names of tags of interest are stored under [1mrefs/tags/[22m. A symbolic ref named [1mHEAD [22mcontains the name of the currently checked-out branch.
+
+     The index file is initialized with a list of all paths and, for each path, a blob object and a set of attributes. The blob object represents the  con‐
+     tents  of  the file as of the head of the current branch. The attributes (last modified time, size, etc.) are taken from the corresponding file in the
+     working tree. Subsequent changes to the working tree can be found by comparing these attributes. The index may be updated with new  content,  and  new
+     commits may be created from the content stored in the index.
+
+     The  index is also capable of storing multiple entries (called "stages") for a given pathname. These stages are used to hold the various unmerged ver‐
+     sion of a file when a merge is in progress.
+
+[1mSECURITY[0m
+     Some configuration options and hook files may cause Git to run arbitrary shell commands. Because configuration and hooks  are  not  copied  using  [1mgit[0m
+     [1mclone[22m, it is generally safe to clone remote repositories with untrusted content, inspect them with [1mgit log[22m, and so on.
+
+     However,  it is not safe to run Git commands in a [1m.git [22mdirectory (or the working tree that surrounds it) when that [1m.git [22mdirectory itself comes from an
+     untrusted source. The commands in its config and hooks are executed in the usual way.
+
+     By default, Git will refuse to run when the repository is owned by someone other than the user running the command. See the entry  for  [1msafe.directory[0m
+     in [1mgit-config[22m(1). While this can help protect you in a multi-user environment, note that you can also acquire untrusted repositories that are owned by
+     you  (for  example,  if  you extract a zip file or tarball from an untrusted source). In such cases, you’d need to "sanitize" the untrusted repository
+     first.
+
+     If you have an untrusted [1m.git [22mdirectory, you should first clone it with [1mgit clone --no-local [22mto obtain a clean copy. Git does restrict the set of  op‐
+     tions  and  hooks  that  will  be  run  by [1mupload-pack[22m, which handles the server side of a clone or fetch, but beware that the surface area for attack
+     against [1mupload-pack [22mis large, so this does carry some risk. The safest thing is to serve the repository as an unprivileged user (either  via  [1mgit-dae‐[0m
+     [1mmon[22m(1), ssh, or using other tools to change user ids). See the discussion in the [1mSECURITY [22msection of [1mgit-upload-pack[22m(1).
+
+[1mFURTHER DOCUMENTATION[0m
+     See the references in the "description" section to get started using Git. The following is probably more detail than necessary for a first-time user.
+
+     The [34m[1mGit concepts chapter of the user-manual[0m[1m[22m[3] and [1mgitcore-tutorial[22m(7) both provide introductions to the underlying Git architecture.
+
+     See [1mgitworkflows[22m(7) for an overview of recommended workflows.
+
+     See also the [34m[1mhowto[0m[1m[22m[4] documents for some useful examples.
+
+     The internals are documented in the [34m[1mGit API documentation[0m[1m[22m[5].
+
+     Users migrating from CVS may also want to read [1mgitcvs-migration[22m(7).
+
+[1mAUTHORS[0m
+     Git  was  started  by  Linus  Torvalds,  and  is  currently  maintained  by Junio C Hamano. Numerous contributions have come from the Git mailing list
+     <[34m[1mgit@vger.kernel.org[0m[1m[22m[6]>. [34m[1mhttps://openhub.net/p/git/contributors/summary [0m[1m[22mgives you a more complete list of contributors.
+
+     If you have a clone of git.git itself, the output of [1mgit-shortlog[22m(1) and [1mgit-blame[22m(1) can show you the authors for specific parts of the project.
+
+[1mREPORTING BUGS[0m
+     Report bugs to the Git mailing list <[34m[1mgit@vger.kernel.org[0m[1m[22m[6]> where the development and maintenance is primarily done. You do not have to be subscribed
+     to the list to send a message there. See the list archive at [34m[1mhttps://lore.kernel.org/git [0m[1m[22mfor previous bug reports and other discussions.
+
+     Issues which are security relevant should be disclosed privately to the Git Security mailing list <[34m[1mgit-security@googlegroups.com[0m[1m[22m[7]>.
+
+[1mSEE ALSO[0m
+     [1mgittutorial[22m(7), [1mgittutorial-2[22m(7), [1mgiteveryday[22m(7), [1mgitcvs-migration[22m(7), [1mgitglossary[22m(7), [1mgitcore-tutorial[22m(7), [1mgitcli[22m(7), [34m[1mThe Git User’s Manual[0m[1m[22m[1],  [1mgit‐[0m
+     [1mworkflows[22m(7)
+
+[1mGIT[0m
+     Part of the [1mgit[22m(1) suite
+
+[1mNOTES[0m
+      1. Git User’s Manual
+         file:///nix/store/j6db4k0sk3yylzsb4ab1qqry4dqhn4yj-git-2.54.0-doc/share/doc/git/user-manual.html
+
+      2. Trace2 documentation
+         file:///nix/store/j6db4k0sk3yylzsb4ab1qqry4dqhn4yj-git-2.54.0-doc/share/doc/git/technical/api-trace2.html
+
+      3. Git concepts chapter of the user-manual
+         file:///nix/store/j6db4k0sk3yylzsb4ab1qqry4dqhn4yj-git-2.54.0-doc/share/doc/git/user-manual.html#git-concepts
+
+      4. howto
+         file:///nix/store/j6db4k0sk3yylzsb4ab1qqry4dqhn4yj-git-2.54.0-doc/share/doc/git/howto-index.html
+
+      5. Git API documentation
+         file:///nix/store/j6db4k0sk3yylzsb4ab1qqry4dqhn4yj-git-2.54.0-doc/share/doc/git/technical/api-index.html
+
+      6. git@vger.kernel.org
+         mailto:git@vger.kernel.org
+
+      7. git-security@googlegroups.com
+         mailto:git-security@googlegroups.com
+
+Git 2.54.0                                                               04/20/2026                                                                  [4mGIT[24m(1)
