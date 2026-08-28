@@ -58,6 +58,8 @@ in
   layout = "us,ru";
   options = "grp:alt_shift_toggle";
   };
+  #mullvad deamon
+  services.mullvad-vpn.enable = true;
 
   # Enable CUPS to print documents.
   services.printing.enable = true;
@@ -116,10 +118,12 @@ in
   # List packages installed in system profile. To search, run:
   # $ nix search wget
   environment.systemPackages = with pkgs; [
-  #  vim # Do not forget to add an editor to edit configuration.nix! The Nano editor is also installed by default.
-  #  wget
+    vim # Do not forget to add an editor to edit configuration.nix! The Nano editor is also installed by default.
+    wget
     vpnToggle
     libnotify
+    mullvad-vpn
+    antigravity
   ];
 
   # Some programs need SUID wrappers, can be configured further or are
