@@ -137,6 +137,7 @@ in
     btop                # Resource monitor
     nmap                # Network scanner
     dnsutils            # DNS utilities (dig, nslookup)
+    lsof
 
     # Containers & Orchestration
     docker              # Docker CLI
@@ -186,7 +187,8 @@ in
 
   # Enable the OpenSSH daemon.
   # services.openssh.enable = true;
-
+  hardware.bluetooth.enable = true;
+  hardware.bluetooth.powerOnBoot = true;
   # Open ports in the firewall.
   # networking.firewall.allowedTCPPorts = [ ... ];
   # networking.firewall.allowedUDPPorts = [ ... ];
