@@ -184,7 +184,8 @@ in
   # };
 
   # List services that you want to enable:
-
+  services.gnome.gnome-keyring.enable = true;
+  security.pam.services.sddm.enableGnomeKeyring = true;
   # Enable the OpenSSH daemon.
   # services.openssh.enable = true;
   hardware.bluetooth.enable = true;
