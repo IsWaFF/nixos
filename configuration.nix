@@ -87,12 +87,15 @@ in
   users.users."waff" = {
     isNormalUser = true;
     description = "WaFF";
-    extraGroups = [ "networkmanager" "wheel" ];
+    extraGroups = [ "networkmanager" "wheel" "docker" ];
     packages = with pkgs; [
       kdePackages.kate
     #  thunderbird
     ];
   };
+
+  # Enable Docker service
+  virtualisation.docker.enable = true;
 
   # Отключаем залипший диод микрофона (очищаем триггер и гасим яркость)
   systemd.tmpfiles.rules = [
@@ -118,12 +121,57 @@ in
   # List packages installed in system profile. To search, run:
   # $ nix search wget
   environment.systemPackages = with pkgs; [
-    vim # Do not forget to add an editor to edit configuration.nix! The Nano editor is also installed by default.
+    # Basic CLI & Text Tools
+    vim
     wget
+    curl
+    git
+    gh                  # GitHub CLI
+    glab                # GitLab CLI
+    jq                  # JSON processor
+    yq-go               # YAML processor
+    ripgrep             # Search tool
+    fd                  # Find tool
+    fzf                 # Fuzzy finder
+    htop                # Process viewer
+    btop                # Resource monitor
+    nmap                # Network scanner
+    dnsutils            # DNS utilities (dig, nslookup)
+
+    # Containers & Orchestration
+    docker              # Docker CLI
+    docker-compose      # Docker Compose
+    podman              # Podman CLI
+    podman-compose      # Podman Compose
+    kubectl             # Kubernetes CLI
+    kubectx             # Kubernetes context/namespace switcher
+    kubernetes-helm     # Kubernetes package manager (Helm)
+    k9s                 # Kubernetes TUI
+    minikube            # Local Kubernetes cluster
+    kind                # Kubernetes in Docker
+    lazydocker          # Docker TUI
+    stern               # Multi-pod log streaming
+
+    # Infrastructure as Code (IaC) & Automation
+    terraform           # Infrastructure provisioning
+    opentofu            # Open source Terraform fork
+    terragrunt          # Terraform wrapper
+    ansible             # Automation & configuration management
+    packer              # Machine image builder
+    pulumi              # Infrastructure as Code framework
+
+    # CI/CD, GitOps & Security
+    argocd              # ArgoCD CLI
+    fluxcd              # Flux CD CLI
+    vault               # Secrets management
+    trivy               # Security scanner
+
+    # Desktop & System Utilities
     vpnToggle
     libnotify
     mullvad-vpn
     antigravity
+    telegram-desktop
   ];
 
   # Some programs need SUID wrappers, can be configured further or are
